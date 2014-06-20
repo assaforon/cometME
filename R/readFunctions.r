@@ -4,6 +4,7 @@ readSensor<-function(filename,alphSearch=10,...)
 {
 require(lubridate)
 tmp=scan(filename,what='list',sep='\n',quiet=TRUE)
+#cat(tmp[[1]],'\n')
 numind=grep("^[0-9]",tmp)
 firstInd=min(which(diff(numind)==1)) ## 1st pair of consecutive numbers
 firstNum=numind[firstInd]
@@ -15,14 +16,14 @@ letterInd=grep('[A-Z]',substr(tmp,1,alphSearch))
 letterInd=letterInd[letterInd>=firstNum]
 if(length(letterInd)>0) lastNum=min(lastNum,min(letterInd)-1)
 tmp0=tmp
-tmp=read.csv(filename,skip=firstNum-2,nrow=lastNum-firstNum+1,as.is=TRUE,strip.white=TRUE,...)
+tmp=read.csv(filename,skip=firstNum-2,nrow=lastNum-firstNum+1,as.is=TRUE,strip.white=TRUE,row.names=NULL,...)
 tmp=tmp[!is.na(tmp[,1]),]
 
 ### In one format, actual names are 2 rows above data; let's grab this
 if(substr(names(tmp)[1],1,2)=='hh')  {
 	names(tmp)=strsplit(tmp0[[firstNum-2]],split=',')[[1]]
 	names(tmp)=gsub('[+ /-]','.',names(tmp))
-} else if(substr(names(tmp)[2],1,2)=='L1')  {
+} else if(substr(names(tmp)[3],1,2)=='L1')  {
 ### In another format, it's at row 1
 	names(tmp)=strsplit(tmp0[[1]],split=',')[[1]]
 	names(tmp)=gsub('[+ /%°-]','.',names(tmp))
