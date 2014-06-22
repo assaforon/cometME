@@ -12,12 +12,19 @@ return(list(interval=mindiff,gaps=diffs%/%mindiff-1))
 }
 
 #' returning an interpolated reqular sequence of specified resolution
-interpol<-function(dat,invars=c("Battery.Voltage","Wind.Speed","RPM"),outvars=c("Timestamp","Load","Windspeed","Solar"),targInterval=10)
+#' First column is assumed to be time stamp
+
+interpol<-function(dat,invars=c("Battery.Voltage","Wind.Speed","RPM"),outvars=NULL,targInterval=10)
 {
 require(lubridate)
 dout=NULL
+invars=c(names(dat)[1],invars)
+if(is.null(outvars)) outvars=invars
+
+
 edges=range(dat[,1])
 outtimes=seq(edges[1],edges[2],by=60*targInterval)
+
 if(all(outtimes %in% dat[,1]))
 {
 	dout=dat[dat[,1] %in% outtimes,invars]
@@ -25,10 +32,10 @@ if(all(outtimes %in% dat[,1]))
 } else {
 	### interpolation
 	dout=data.frame(Timestamp=outtimes)
-	dout$Load=approx(dat[,1],dat[,invars[1]],xout=dout$Timestamp)$y
-	dout$Windspeed=approx(dat[,1],dat[,invars[2]],xout=dout$Timestamp)$y
-	dout$Solar=approx(dat[,1],dat[,invars[3]],xout=dout$Timestamp)$y
+	for (a in 2:length(invars))  dout=cbind(dout,approx(dat[,1],dat[,invars[a]],xout=dout$Timestamp)$y)
+	names(dout)=outvars
 }
+names(dout)[1]="Timestamp"
 return(dout)		
 }
 #
