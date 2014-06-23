@@ -1,3 +1,6 @@
+#' Produce a single 'Spaghetti' dataset from many similar-format input files
+
+
 spaghetti<-function(datalist,...)
 {
 filenum=length(datalist$data)

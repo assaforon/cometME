@@ -21,13 +21,15 @@ dout=NULL
 invars=c(names(dat)[1],invars)
 if(is.null(outvars)) outvars=invars
 
-
-edges=range(dat[,1])
+## Copying a "clean", "narrow" subset that has no critical missing entries
+dat0=dat[complete.cases(dat[,invars]),invars]
+edges=range(dat0[,1])
 outtimes=seq(edges[1],edges[2],by=60*targInterval)
 
-if(all(outtimes %in% dat[,1]))
+if(all(outtimes %in% dat0[,1]))
+### All Clear!
 {
-	dout=dat[dat[,1] %in% outtimes,invars]
+	dout=dat0[dat0[,1] %in% outtimes,]
 	names(dout)=outvars
 } else {
 	### interpolation
@@ -36,7 +38,7 @@ if(all(outtimes %in% dat[,1]))
 	names(dout)=outvars
 }
 names(dout)[1]="Timestamp"
-return(dout)		
+return(dout[order(dout$Timestamp),])		
 }
 #
 
