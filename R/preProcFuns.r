@@ -13,13 +13,21 @@ return(list(interval=mindiff,gaps=diffs%/%mindiff-1))
 
 #' returning an interpolated reqular sequence of specified resolution
 #' First column is assumed to be time stamp
-
+#' @param dat a data structure produced by \code{\link{batchRead}}
+#' @param invars character vector with names of variables (=columns) to be read from the data. Excludes the first column which is assumed to contain the time stamp, and is read in any case
+#' @param outvars character vector with names to replace the names in \code{invar}. If \code{NULL} (default), names will be left unchanged.
+#' @param targInterval numeric, the time interval to be used for the output dataset, in minutes.
+ 
 interpol<-function(dat,invars=c("Battery.Voltage","Wind.Speed","RPM"),outvars=NULL,targInterval=10)
 {
 require(lubridate)
+
+if(is.null(outvars)) outvars=invars
+if(length(outvars)!=length(invars)) stop("Variable names vectors have different lengths.\n")
+
 dout=NULL
 invars=c(names(dat)[1],invars)
-if(is.null(outvars)) outvars=invars
+outvars=c("Timestamp",outvars)
 
 ## Copying a "clean", "narrow" subset that has no critical missing entries
 dat0=dat[complete.cases(dat[,invars]),invars]
